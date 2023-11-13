@@ -22,6 +22,7 @@ const Topic = Type.Object({
 const BankSoal = Type.Object({
   id: Type.Number(),
   question: Type.String(),
+  difficulty: Type.Optional(Type.Number()),
 });
 
 const BankSoalAnswer = Type.Object({

@@ -6,6 +6,35 @@ const DefaultSuccessResponse = Type.Object({
   message: Type.String(),
 });
 
+const BankSoalSchema = {
+  read_many: {
+    response: Type.Object({
+      data: Type.Array(
+        Type.Intersect([
+          DbSchema["bank_soal"],
+          Type.Object({
+            topics: Type.Array(Type.String()),
+          }),
+        ])
+      ),
+    }),
+  },
+  create: {
+    body: Type.Object({
+      question: Type.String(),
+      difficulty: Type.Optional(Type.Number()),
+      topics: Type.Optional(Type.Array(Type.Number())),
+      answers: Type.Array(
+        Type.Object({
+          answer: Type.String(),
+          is_correct: Type.Boolean(),
+        })
+      ),
+    }),
+    response: DefaultSuccessResponse,
+  },
+};
+
 const StudentCRUDSchema = {
   read_many: {
     response: Type.Object({
@@ -40,3 +69,4 @@ const StudentCRUDSchema = {
 };
 
 export type StudentCRUD = RecursiveStatic<typeof StudentCRUDSchema>;
+export type BankSoalCRUD = RecursiveStatic<typeof BankSoalSchema>;

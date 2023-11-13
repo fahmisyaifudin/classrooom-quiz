@@ -5,10 +5,17 @@ import { AppResult } from "../schema/error";
 
 const router = express.Router();
 
-router.get<{}, StudentCRUD["read_many"]["response"]>("/", async (req, res) => {
-  const student = await db.selectFrom("student").selectAll().execute();
-  return res.json({ data: student });
-});
+router.get<{}, AppResult<StudentCRUD["read_many"]["response"]>>(
+  "/",
+  async (req, res) => {
+    try {
+      const student = await db.selectFrom("student").selectAll().execute();
+      return res.json({ data: student });
+    } catch (error) {
+      return res.status(500).json({ message: "Fail: Internal Server Error" });
+    }
+  }
+);
 
 router.get<
   StudentCRUD["read_single"]["params"],
@@ -32,8 +39,12 @@ router.post<
   AppResult<StudentCRUD["create"]["response"]>,
   StudentCRUD["create"]["body"]
 >("/", async (req, res) => {
-  await db.insertInto("student").values(req.body).executeTakeFirstOrThrow();
-  return res.status(201).json({ message: "Success" });
+  try {
+    await db.insertInto("student").values(req.body).executeTakeFirstOrThrow();
+    return res.status(201).json({ message: "Success" });
+  } catch (err) {
+    return res.status(500).json({ message: "Fail: Internal Server Error" });
+  }
 });
 
 router.put<
