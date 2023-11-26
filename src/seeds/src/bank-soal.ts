@@ -2,16 +2,28 @@ import { Kysely } from "kysely";
 import { Entities, Database } from "../../schema/database";
 import { faker } from "@faker-js/faker";
 
-export async function seedBankSoal(db: Kysely<Database>): Promise<void> {
+export async function seedBankSoal(
+  db: Kysely<Database>
+): Promise<Entities["bank_soal"]["select"][]> {
   console.log("Inserting sample soal data to table...");
 
-  const insertTopic: Entities["topic"]["insert"][] = Array(5)
-    .fill(null)
-    .map(() => {
-      return {
-        name: faker.word.noun(),
-      };
-    });
+  const insertTopic: Entities["topic"]["insert"][] = [
+    {
+      name: "Artificial Intelegence",
+    },
+    {
+      name: "Database",
+    },
+    {
+      name: "Basic Programming",
+    },
+    {
+      name: "Web Programming",
+    },
+    {
+      name: "Computer Network",
+    },
+  ];
 
   await db.insertInto("topic").values(insertTopic).execute();
   const topic = await db.selectFrom("topic").selectAll().execute();
@@ -47,4 +59,6 @@ export async function seedBankSoal(db: Kysely<Database>): Promise<void> {
       })
       .execute();
   }
+
+  return bankSoal;
 }

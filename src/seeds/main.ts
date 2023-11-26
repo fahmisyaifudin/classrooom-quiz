@@ -3,6 +3,8 @@ import { Kysely, MysqlDialect } from "kysely";
 import { Database } from "../schema/database";
 import { seedStudent } from "./src/student";
 import { seedBankSoal } from "./src/bank-soal";
+import { seedUser } from "./src/user";
+import { seedQuiz } from "./src/quiz";
 
 seedInitialData();
 
@@ -22,7 +24,10 @@ export async function seedInitialData() {
 
   console.log("Seeding student data...");
   await seedStudent(db);
-  await seedBankSoal(db);
+  const user = await seedUser(db);
+  const bankSoal = await seedBankSoal(db);
+
+  await seedQuiz(db, { user, bank_soal: bankSoal });
 
   await db.destroy();
 }

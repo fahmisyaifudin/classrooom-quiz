@@ -4,8 +4,11 @@ import { BankSoalCRUD } from "../schema/api";
 import { sql } from "kysely";
 import { AppResult } from "../schema/error";
 import { Entities } from "../schema/database";
+import { verifyToken } from "../middlewares";
 
 const router = express.Router();
+
+router.use(verifyToken);
 
 router.get<{}, AppResult<BankSoalCRUD["read_many"]["response"]>>(
   "/",
@@ -26,6 +29,19 @@ router.get<{}, AppResult<BankSoalCRUD["read_many"]["response"]>>(
         .execute();
 
       return res.json({ data: soal });
+    } catch (err) {
+      return res.status(500).json({ message: "Fail: Internal Server Error" });
+    }
+  }
+);
+
+router.get<{}, AppResult<BankSoalCRUD["topic"]["response"]>>(
+  "/topic",
+  async (req, res) => {
+    try {
+      const topic = await db.selectFrom("topic").selectAll().execute();
+
+      return res.json({ data: topic });
     } catch (err) {
       return res.status(500).json({ message: "Fail: Internal Server Error" });
     }

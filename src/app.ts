@@ -6,6 +6,7 @@ import cors from "cors";
 import * as middlewares from "./middlewares";
 import api from "./api";
 import MessageResponse from "./schema/response";
+import { initFirebase } from "./libs/firebase";
 
 require("dotenv").config();
 
@@ -16,6 +17,8 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+initFirebase();
+
 app.get<{}, MessageResponse>("/", (req, res) => {
   res.json({
     message: "Classroom Quiz",
@@ -23,7 +26,6 @@ app.get<{}, MessageResponse>("/", (req, res) => {
 });
 
 app.use("/api", api);
-
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
 

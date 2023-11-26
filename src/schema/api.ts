@@ -33,6 +33,11 @@ const BankSoalSchema = {
     }),
     response: DefaultSuccessResponse,
   },
+  topic: {
+    response: Type.Object({
+      data: Type.Array(DbSchema["topic"]),
+    }),
+  },
 };
 
 const StudentCRUDSchema = {

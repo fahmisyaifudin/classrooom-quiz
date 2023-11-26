@@ -6,7 +6,7 @@ import {
   Insertable,
   Updateable,
 } from "kysely";
-import { RecursiveStatic, ExpandDeep } from "./generic";
+import { RecursiveStatic, ExpandDeep, Nullable } from "./generic";
 
 const Student = Type.Object({
   id: Type.Number(),
@@ -38,6 +38,27 @@ const BankSoalTopic = Type.Object({
   topic_id: Type.Number(),
 });
 
+const User = Type.Object({
+  id: Type.Number(),
+  auth_key: Type.String(),
+  fullname: Type.String(),
+  role: Type.Union([Type.Literal("student"), Type.Literal("lecturer")]),
+});
+
+const Quiz = Type.Object({
+  id: Type.Number(),
+  description: Nullable(Type.String()),
+  start: Type.String(),
+  end: Type.String(),
+  created_by: Type.Number(),
+});
+
+const QuizSoal = Type.Object({
+  id: Type.Number(),
+  quiz_id: Type.Number(),
+  bank_soal_id: Type.Number(),
+});
+
 type DefaultAutoCols = {
   id: Generated<number>;
   created_at: ColumnType<number, number | undefined, never>;
@@ -50,6 +71,9 @@ export const DbSchema = {
   bank_soal: BankSoal,
   bank_soal_answer: BankSoalAnswer,
   bank_soal_topic: BankSoalTopic,
+  user: User,
+  quiz: Quiz,
+  quiz_soal: QuizSoal,
 };
 
 export type Db = RecursiveStatic<typeof DbSchema>;
@@ -73,4 +97,7 @@ export type Database = {
   bank_soal: Modify<Db["bank_soal"], DefaultAutoCols>;
   bank_soal_answer: Modify<Db["bank_soal_answer"], DefaultAutoCols>;
   bank_soal_topic: Modify<Db["bank_soal_topic"], DefaultAutoCols>;
+  user: Modify<Db["user"], DefaultAutoCols>;
+  quiz: Modify<Db["quiz"], DefaultAutoCols>;
+  quiz_soal: Modify<Db["quiz_soal"], DefaultAutoCols>;
 };
