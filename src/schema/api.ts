@@ -89,6 +89,7 @@ const QuizCRUDSchema = {
         Type.Object({
           questions: Type.Array(
             Type.Object({
+              id: Type.Number(),
               question: Type.String(),
               answers: Type.Array(
                 Type.Object({
@@ -100,6 +101,22 @@ const QuizCRUDSchema = {
           ),
         }),
       ]),
+    }),
+  },
+  answer: {
+    params: {
+      id: Type.Number(),
+    },
+    body: Type.Array(
+      Type.Object({
+        question_id: Type.Number(),
+        answer_id: Type.Number(),
+      })
+    ),
+    response: Type.Object({
+      data: Type.Object({
+        score: Type.Number(),
+      }),
     }),
   },
 };

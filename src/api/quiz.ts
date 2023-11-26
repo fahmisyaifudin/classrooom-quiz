@@ -7,7 +7,7 @@ import { sql } from "kysely";
 
 const router = express.Router();
 
-// router.use(verifyToken);
+router.use(verifyToken);
 
 router.get<{}, AppResult<QuizCRUD["read_many"]["response"]>>(
   "/",
@@ -134,6 +134,7 @@ router.get<
       )
       .where("bank_soal.id", "in", arrBankSoal)
       .select([
+        "bank_soal.id",
         "question",
         sql<AnswerItem>`JSON_ARRAYAGG(JSON_OBJECT('answer', answer, 'id', bank_soal_answer.id))`.as(
           "answers"
@@ -143,6 +144,52 @@ router.get<
       .execute();
 
     return res.json({ data: { ...resultHeader, questions } });
+  } catch (err) {
+    return res.status(500).json({ message: "Fail: Internal Server Error" });
+  }
+});
+
+router.post<
+  QuizCRUD["answer"]["params"],
+  AppResult<QuizCRUD["answer"]["response"]>,
+  QuizCRUD["answer"]["body"]
+>("/answer/:id", async (req, res) => {
+  try {
+    const header = await db
+      .selectFrom("quiz")
+      .innerJoin("quiz_soal", "quiz_soal.quiz_id", "quiz.id")
+      .where("quiz.id", "=", req.params.id)
+      .select(["quiz_soal.bank_soal_id"])
+      .execute();
+
+    const arrBankSoal = header.map((x) => x.bank_soal_id);
+
+    const answers = await db
+      .selectFrom("bank_soal_answer")
+      .where("bank_soal_answer.bank_soal_id", "in", arrBankSoal)
+      .select([
+        "bank_soal_answer.bank_soal_id as question_id",
+        "bank_soal_answer.id as answer_id",
+        "bank_soal_answer.is_correct",
+      ])
+      .execute();
+
+    const n_soal = arrBankSoal.length;
+    let n_correct = 0;
+
+    for (const answer of req.body) {
+      const [checkAnswer] = answers.filter(
+        (x) =>
+          x.answer_id == answer.answer_id && x.question_id == answer.question_id
+      );
+      if (checkAnswer && checkAnswer.is_correct) {
+        n_correct++;
+      }
+    }
+
+    const score = (n_correct / n_soal) * 100;
+
+    return res.status(200).json({ data: { score } });
   } catch (err) {
     return res.status(500).json({ message: "Fail: Internal Server Error" });
   }
