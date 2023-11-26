@@ -1,6 +1,6 @@
 import { DbSchema } from "./database";
 import { Type } from "@sinclair/typebox";
-import { RecursiveStatic } from "./generic";
+import { RecursiveStatic, Nullable } from "./generic";
 
 const DefaultSuccessResponse = Type.Object({
   message: Type.String(),
@@ -40,6 +40,70 @@ const BankSoalSchema = {
   },
 };
 
+const ProfileSchema = {
+  read: {
+    response: Type.Object({
+      data: DbSchema["user"],
+    }),
+  },
+};
+
+const QuizCRUDSchema = {
+  create: {
+    body: Type.Object({
+      description: Nullable(Type.String()),
+      start: Type.String(),
+      end: Type.String(),
+      detail: Type.Array(
+        Type.Object({
+          topic_id: Type.Number(),
+          qty: Type.Number(),
+          difficulty: Type.Number(),
+        })
+      ),
+    }),
+    response: Type.Object({
+      data: DefaultSuccessResponse,
+    }),
+  },
+  read_many: {
+    response: Type.Object({
+      data: Type.Array(
+        Type.Intersect([
+          DbSchema["quiz"],
+          Type.Object({
+            name_created: Type.String(),
+            qty: Type.Number(),
+          }),
+        ])
+      ),
+    }),
+  },
+  read_single: {
+    params: {
+      id: Type.Number(),
+    },
+    response: Type.Object({
+      data: Type.Intersect([
+        Type.Pick(DbSchema["quiz"], ["description", "start", "end"]),
+        Type.Object({
+          questions: Type.Array(
+            Type.Object({
+              question: Type.String(),
+              answers: Type.Array(
+                Type.Object({
+                  id: Type.Number(),
+                  answer: Type.String(),
+                })
+              ),
+            })
+          ),
+        }),
+      ]),
+    }),
+  },
+};
+
 const StudentCRUDSchema = {
   read_many: {
     response: Type.Object({
@@ -75,3 +139,5 @@ const StudentCRUDSchema = {
 
 export type StudentCRUD = RecursiveStatic<typeof StudentCRUDSchema>;
 export type BankSoalCRUD = RecursiveStatic<typeof BankSoalSchema>;
+export type ProfileCRUD = RecursiveStatic<typeof ProfileSchema>;
+export type QuizCRUD = RecursiveStatic<typeof QuizCRUDSchema>;
