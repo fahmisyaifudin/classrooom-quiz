@@ -21,7 +21,6 @@ export async function verifyToken(
     }
     const idToken = bearerToken?.split("Bearer ")[1] as string;
     const decodedToken = await getAuth().verifyIdToken(idToken);
-    res.cookie("x-user-uid", decodedToken.uid);
     return next();
   } catch (error) {
     console.log(error);

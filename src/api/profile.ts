@@ -12,7 +12,8 @@ router.get<{}, AppResult<ProfileCRUD["read"]["response"]>>(
   "/",
   async (req, res) => {
     try {
-      const userId = req.cookies["x-user-uid"] as string;
+      const userId = req.headers["x-user-uid"] as string;
+      console.log(userId);
       const profile = await db
         .selectFrom("user")
         .where("auth_key", "=", userId)
@@ -21,6 +22,7 @@ router.get<{}, AppResult<ProfileCRUD["read"]["response"]>>(
 
       return res.json({ data: profile });
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ message: "Fail: Internal Server Error" });
     }
   }

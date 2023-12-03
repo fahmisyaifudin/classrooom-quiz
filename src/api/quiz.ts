@@ -45,7 +45,7 @@ router.post<
   QuizCRUD["create"]["body"]
 >("/", async (req, res) => {
   try {
-    const userId = req.cookies["x-user-uid"] as string;
+    const userId = req.headers["x-user-uid"] as string;
     const user = await db
       .selectFrom("user")
       .where("auth_key", "=", userId)
@@ -91,6 +91,7 @@ router.post<
     });
     return res.status(201).json({ message: "Success" });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: "Fail: Internal Server Error" });
   }
 });
@@ -136,7 +137,7 @@ router.get<
       .select([
         "bank_soal.id",
         "question",
-        sql<AnswerItem>`JSON_ARRAYAGG(JSON_OBJECT('answer', answer, 'id', bank_soal_answer.id))`.as(
+        sql<AnswerItem>`JSON_ARRAYAGG(JSON_OBJECT('answer', answer, 'id', bank_soal_answer.id, 'is_correct', is_correct))`.as(
           "answers"
         ),
       ])
