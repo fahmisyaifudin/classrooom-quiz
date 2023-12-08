@@ -6,15 +6,17 @@ import { seedBankSoal } from "./src/bank-soal";
 import { seedUser } from "./src/user";
 import { seedQuiz } from "./src/quiz";
 
+require("dotenv").config();
+
 seedInitialData();
 
 export async function seedInitialData() {
   const dialect = new MysqlDialect({
     pool: createPool({
-      database: "classroom-quiz",
-      host: "localhost",
-      user: "mysql",
-      password: "mysql",
+      database: process.env["DATABASE_NAME"],
+      host: process.env["DATABASE_HOST"],
+      user: process.env["DATABASE_USER"],
+      password: process.env["DATABASE_PASSWORD"],
       port: 3306,
     }),
   });

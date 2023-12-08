@@ -4,12 +4,14 @@ import { FileMigrationProvider, Kysely, Migrator, MysqlDialect } from "kysely";
 import * as path from "path";
 import { Database } from "../schema/database";
 
+require("dotenv").config();
+
 const dialect = new MysqlDialect({
   pool: createPool({
-    database: "classroom-quiz",
-    host: "localhost",
-    user: "mysql",
-    password: "mysql",
+    database: process.env["DATABASE_NAME"],
+    host: process.env["DATABASE_HOST"],
+    user: process.env["DATABASE_USER"],
+    password: process.env["DATABASE_PASSWORD"],
     port: 3306,
   }),
 });
